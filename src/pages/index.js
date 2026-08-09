@@ -558,6 +558,9 @@ export default function FlorigenSite() {
               </div>
             </div>
           ))}
+          <div style={{ marginTop: "32px" }}>
+            <a href="/roadmap" style={s.link}>詳細ロードマップを見る →</a>
+          </div>
         </Section>
 
         {/* Research Areas */}
