@@ -147,6 +147,12 @@ const s = {
     margin: "0 auto",
     position: "relative",
   },
+  heroLogo: {
+    height: "112px",
+    width: "auto",
+    display: "block",
+    marginBottom: "40px",
+  },
   heroLabel: {
     fontSize: "11px",
     letterSpacing: "0.25em",
@@ -423,6 +429,7 @@ export default function FlorigenSite() {
           @media (max-width: 640px) {
             .grid2 { grid-template-columns: 1fr !important; }
             .hero { padding: 100px 24px 60px !important; }
+            .hero-logo { height: 76px !important; margin-bottom: 28px !important; }
             .section { padding: 0 24px !important; }
             .nav { padding: 16px 24px !important; }
             .footer-inner { padding: 40px 24px !important; flex-direction: column; gap: 16px; }
@@ -448,6 +455,12 @@ export default function FlorigenSite() {
 
         {/* Hero */}
         <div style={s.hero} className="hero">
+          <img
+            src="/florigen-logo-hero-dark-bg.svg"
+            alt="Florigen AI"
+            style={s.heroLogo}
+            className="hero-logo"
+          />
           <div style={s.heroLabel}>
             <span style={s.dot} />
             RESEARCH & DEVELOPMENT PROJECT
