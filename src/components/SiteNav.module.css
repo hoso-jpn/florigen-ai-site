@@ -1,0 +1,23 @@
+.nav {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 48px;
+  background: rgba(10, 15, 10, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #1e3020;
+}
+
+.logo { display: block; width: auto; height: 24px; }
+.links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.links a { color: #9db59d; font-size: 12px; letter-spacing: 0.08em; padding: 8px 0; }
+.links a:hover, .links a[aria-current="page"] { color: #8fd4a0; }
+
+@media (max-width: 760px) {
+  .nav { flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px 24px; }
+  .links { gap: 4px 16px; }
+}

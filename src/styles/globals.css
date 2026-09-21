@@ -35,6 +35,15 @@ a {
   text-decoration: none;
 }
 
+section[id], main[id] { scroll-margin-top: 160px; }
+a:focus-visible, summary:focus-visible { outline: 2px solid #8fd4a0; outline-offset: 5px; }
+.skip-link { position: fixed; z-index: 200; top: 8px; left: 16px; padding: 8px 16px; background: #e8f0e8; color: #0a0f0a; transform: translateY(-160%); }
+.skip-link:focus { transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
