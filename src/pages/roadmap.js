@@ -1,70 +1,25 @@
-import Head from "next/head";
+import Link from "next/link";
+import SiteHead from "../components/SiteHead";
+import SiteNav from "../components/SiteNav";
+import { phases, currentStatus, updatedAt } from "../data/research";
 
 const COLORS = {
   bg: "#0a0f0a",
   bgCard: "#0f1a0f",
-  green: "#4a7c59",
+  green: "#79ae86",
   greenLight: "#6aad7a",
   greenBright: "#8fd4a0",
   text: "#e8f0e8",
-  textMuted: "#7a9a7a",
+  textMuted: "#9db59d",
   border: "#1e3020",
   accent: "#c8e6c9",
 };
 
-const phases = [
-  {
-    phase: "Phase 1",
-    period: "2026年5月 〜 2027年4月",
-    theme: "技術基盤構築（シミュレーション）",
-    status: "current",
-    desc: "実機を購入する前に、シミュレーション環境で走行・認識・安全停止の成立性を検証する段階。十勝アズキの栽培条件（条間・畝高・生育ステージ）から機体要件を導出し、Isaac Sim上のデジタルツインで夜間認識・自己位置推定・境界保持・安全停止を再現可能な証跡付きで確認する。",
-  },
-  {
-    phase: "Phase 2",
-    period: "2027年5月 〜 2027年12月",
-    theme: "プロトタイプ実機検証（監視付き）",
-    status: "future",
-    desc: "シミュレーション検証を通過した構成で実機を調達し、立入管理した小区画・目視監視・物理E-stopのもとで段階検証を行う。作物損傷・除草効果・停止性能・監視工数を計測し、無人夜間運用へ移行できるかを判断する。",
-  },
-];
-
 const gates = [
-  {
-    gate: "Gate 0",
-    title: "Geometry & ODD",
-    period: "2026年8〜9月",
-    status: "current",
-    desc: "対象作物・生育期・条間・畝高・傾斜・夜間照明・最高速度・監視方式を運行設計領域（ODD）として固定する。機体外形＋安全余白＋工具幅が栽培幾何の中で成立するかを判定し、走行方式と候補機を絞り込む。成立しなければ機体前提を撤回する。",
-  },
-  {
-    gate: "Gate 1",
-    title: "Digital Twin v0",
-    period: "2026年9〜10月",
-    status: "future",
-    desc: "候補機のパラメトリックなロボットモデル（URDF/Xacro）を作成し、シミュレータ上で速度指令・座標変換・オドメトリ・緊急停止・10分間の連続走行を、記録データ（rosbag）付きで再現可能な形で確認する。",
-  },
-  {
-    gate: "Gate 2",
-    title: "Simulation Evidence",
-    period: "2026年10月 〜 2027年2月",
-    status: "future",
-    desc: "20以上の乱数シード×夜間条件で境界逸脱ゼロ・経路完遂率95%以上を確認する。通信断・GNSS欠測・センサー停止・低電圧といった異常を意図的に注入し、安全停止への遷移を反復検証する。",
-  },
-  {
-    gate: "Gate 3",
-    title: "Procurement & Bench",
-    period: "2027年2〜5月",
-    status: "future",
-    desc: "協力圃場の確保と、機体・計算機・センサーの実測評価。積載・重心・消費電力・発熱・低温耐性・保証・納期を確認し、購入可否を決定する。候補は固定せず、検証を通過した構成だけを採用する。",
-  },
-  {
-    gate: "Gate 4",
-    title: "Supervised Field PoC",
-    period: "2027年5〜12月",
-    status: "future",
-    desc: "立入管理した小区画で、目視監視下の停止・復帰・境界保持・作物損傷・除草効果・監視工数・10a当たりコストを計測する。無人夜間運用への移行可否をここで判断する。",
-  },
+  { gate: "Gate 0", title: "観測項目と基準の定義", desc: "対象の生育段階と判定基準を定め、人による観測記録を比較の基準にする。初年度は観測を省略しないベースラインを設ける。" },
+  { gate: "Gate 1", title: "画像・センサーによる観測評価", desc: "照明、天候、生育段階による認識精度と欠測を評価する。位置・日時・区画と画像を対応付け、再検証できる記録を残す。" },
+  { gate: "Gate 2", title: "移動基盤と安全性の検証", desc: "圃場条件から機体・センサーの要件を導出する。シミュレーションと監視付きの小区画実験で、走行・境界保持・安全停止の成立性を確認する。" },
+  { gate: "Gate 3", title: "育種評価への有効性", desc: "観測頻度と精度が選抜判断や評価工数に及ぼす効果を比較する。データ取得量の削減はベースライン取得後に検討し、検証前に効果を断定しない。" },
 ];
 
 const principles = [
@@ -78,7 +33,7 @@ const principles = [
   },
   {
     key: "公的ガイドラインを設計入力に",
-    desc: "農林水産省『農業機械の自動走行に関する安全性確保ガイドライン』（2026年版）とISO 18497:2024を設計の前提とし、危険源・保護方策・検証証跡を整理する。",
+    desc: "対象機体・運用に適用される農林水産省の安全性確保ガイドラインや関連規格について、適用範囲と版を確認し、危険源・保護方策・検証証跡を整理する。",
   },
   {
     key: "無人夜間は最終状態",
@@ -87,17 +42,10 @@ const principles = [
 ];
 
 const hypotheses = [
-  "週1回・深夜2〜4時の高頻度走行により、広葉雑草を大型化する前に継続的に抑制できるか",
-  "夜間LED照明により、逆光・影・日照変動を抑えた安定した作物・雑草認識が可能か",
-  "朝露・水滴・グレア条件下での誤認識リスクをどこまでシミュレーションで事前評価できるか",
-  "受動型の平鍬アタッチメントで、畝間の除草として実用に足る効果が得られるか",
-];
-
-const currentStatus = [
-  "研究開発用ワークステーションの構築完了（Ubuntu 24.04 / ROS 2 Jazzy / Isaac Sim / ローカルAI実行環境）",
-  "ROS 2の基礎検証完了（トピック通信・独自パッケージ作成）",
-  "作物・雑草認識モデルの検討（YOLO系セグメンテーションを実行系、大規模基盤モデルをアノテーション支援に位置付け）",
-  "Gate 0（栽培幾何と機体要件の突き合わせ）を実施中",
+  "小豆の出芽・開花・成熟を、画像とセンサーからどの程度の精度で観測できるか",
+  "人の観測記録に対して、観測頻度を増やすことで生育段階の判定時期をどこまで精密化できるか",
+  "夜間照明・朝露・遮蔽・天候の違いが、認識精度と欠測にどう影響するか",
+  "稠密な観測が育種選抜の判断や記録工数にどのように寄与するか",
 ];
 
 const s = {
@@ -107,30 +55,6 @@ const s = {
     fontFamily: "'Georgia', 'Hiragino Mincho ProN', serif",
     minHeight: "100vh",
     lineHeight: 1.8,
-  },
-  nav: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 100,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "20px 48px",
-    background: "rgba(10,15,10,0.85)",
-    backdropFilter: "blur(12px)",
-    borderBottom: `1px solid ${COLORS.border}`,
-  },
-  navLinks: {
-    display: "flex",
-    gap: "32px",
-    fontSize: "12px",
-    letterSpacing: "0.15em",
-  },
-  navLink: {
-    color: COLORS.textMuted,
-    textDecoration: "none",
   },
   main: {
     maxWidth: "900px",
@@ -288,67 +212,39 @@ const s = {
 export default function RoadmapPage() {
   return (
     <>
-      <Head>
-        <title>Roadmap — Florigen AI</title>
-        <meta
-          name="description"
-          content="Florigen AI 研究開発ロードマップ（公開版）"
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" sizes="32x32" />
-        <link rel="icon" href="/florigen-app-icon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-      </Head>
+      <SiteHead title="研究ロードマップ — Florigen AI" description="生育観測・記録から育種評価、農業Physical AIへ。現在の研究方針と検証段階を示すロードマップ。" path="/roadmap" />
 
       <div style={s.page}>
         <style>{`
           * { box-sizing: border-box; margin: 0; padding: 0; }
           ::selection { background: #4a7c59; color: #e8f0e8; }
           @media (max-width: 640px) {
-            .main { padding: 120px 24px 60px !important; }
-            .nav { padding: 16px 24px !important; }
-            .nav-links { display: none !important; }
+            .main { padding: 160px 24px 60px !important; }
+
             .footer-inner { padding: 40px 24px !important; flex-direction: column; gap: 16px; }
           }
         `}</style>
 
         {/* Nav */}
-        <nav style={s.nav} className="nav">
-          <a href="/">
-            <img
-              src="/florigen-wordmark-dark-bg.svg"
-              alt="FLORIGEN AI"
-              style={{ height: "18px", display: "block" }}
-            />
-          </a>
-          <div style={s.navLinks} className="nav-links">
-            <a href="/#status" style={s.navLink}>Status</a>
-            <a href="/#mission" style={s.navLink}>Mission</a>
-            <a href="/roadmap" style={{ ...s.navLink, color: COLORS.greenBright }}>Roadmap</a>
-            <a href="/#research" style={s.navLink}>Research</a>
-            <a href="/#about" style={s.navLink}>About</a>
-          </div>
-        </nav>
+        <SiteNav roadmap />
 
-        <main style={s.main} className="main">
+        <main id="main-content" tabIndex={-1} style={s.main} className="main">
           <div style={s.pageLabel}>— ROADMAP</div>
           <h1 style={s.pageTitle}>研究開発ロードマップ</h1>
           <p style={s.pageDesc}>
-            Florigen AIの技術開発は、段階的な検証ゲートを通過しながら進めます。
-            シミュレーションでの成立性確認を先行させ、実機調達・実圃場検証は
-            証跡が揃った段階でのみ着手します。
+            生育観測・記録を入口に、稠密な圃場データが育種選抜に与える効果を研究します。
+            以下は検証計画であり、実装済みの機能や実証成果を示すものではありません。
           </p>
-          <div style={s.meta}>公開版 v1.0 — 2026年8月時点</div>
+          <div style={s.meta}>更新日: <time dateTime={updatedAt}>{updatedAt}</time></div>
 
           {/* Phases */}
           <div style={{ ...s.sectionLabel, marginTop: "0" }}>— DEVELOPMENT PHASES</div>
           {phases.map((p) => (
-            <div key={p.phase} style={s.card}>
+            <div key={`Phase ${p.num}`} style={s.card}>
               <div style={s.cardHeader}>
-                <span style={s.gateNum}>{p.phase}</span>
-                <span style={s.cardTitle}>{p.theme}</span>
-                {p.status === "current" && <span style={s.statusBadge}>IN PROGRESS</span>}
-                <span style={s.cardPeriod}>{p.period}</span>
+                <span style={s.gateNum}>{`Phase ${p.num}`}</span>
+                <span style={s.cardTitle}>{p.title}</span>
+                <span style={s.statusBadge}>{p.status}</span>
               </div>
               <p style={s.cardDesc}>{p.desc}</p>
             </div>
@@ -357,16 +253,14 @@ export default function RoadmapPage() {
           {/* Gates */}
           <div style={s.sectionLabel}>— VALIDATION GATES</div>
           <p style={s.sectionDesc}>
-            各ゲートには通過条件を事前に定義し、条件を満たさない限り次の段階へ進みません。
-            機体・計算機などのハードウェアは、ゲートを通過した構成のみを採用します。
+            観測基準、評価方法、移動時の安全性を順に具体化します。
+            実機調達と実圃場検証は、必要な条件と協力体制を確認してから進めます。
           </p>
           {gates.map((g) => (
             <div key={g.gate} style={s.card}>
               <div style={s.cardHeader}>
                 <span style={s.gateNum}>{g.gate}</span>
                 <span style={s.cardTitle}>{g.title}</span>
-                {g.status === "current" && <span style={s.statusBadge}>IN PROGRESS</span>}
-                <span style={s.cardPeriod}>{g.period}</span>
               </div>
               <p style={s.cardDesc}>{g.desc}</p>
             </div>
@@ -411,11 +305,11 @@ export default function RoadmapPage() {
 
           <p style={s.note}>
             本ロードマップは検証結果・現場からのフィードバックに応じて更新されます。
-            時期はいずれも目標であり、各ゲートの通過状況により変動します。
+            各段階の時期は研究計画・協力体制・検証結果に応じて具体化します。
           </p>
 
           <div style={{ marginTop: "64px" }}>
-            <a href="/" style={s.backLink}>← トップページへ戻る</a>
+            <Link href="/" style={s.backLink}>← トップページへ戻る</Link>
           </div>
         </main>
 
